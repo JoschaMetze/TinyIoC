@@ -72,6 +72,7 @@ namespace TinyIoC
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
 
 #if EXPRESSIONS
     using System.Linq.Expressions;
@@ -3788,7 +3789,11 @@ namespace TinyIoC
             {
                 if (registerType.IsInterface())
                 {
+#if WINDOWS_PHONE
+                    if (!registerImplementation.GetInterfaces().Where(itfc=>itfc.Name==registerType.Name).Any())
+#else
                     if (!registerImplementation.FindInterfaces((t, o) => t.Name == registerType.Name, null).Any())
+#endif
                         return false;
                 }
                 else if (registerType.IsAbstract() && registerImplementation.BaseType() != registerType)
